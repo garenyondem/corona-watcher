@@ -2,12 +2,31 @@ import fetch from 'node-fetch';
 import { Telegram } from 'telegraf';
 import { IApiResponse, ICountryData } from './types';
 import { convertToEmoji } from './helpers';
+import ioRedis, { Redis } from 'ioredis';
+import deepDiff from 'deep-diff-object';
+
+const key = 'prev-tr';
 
 async function init() {
-    const client = getTelegramClient(process.env.BOT_TOKEN!);
-    const countryData = await fetchCountryStats(process.env.API_URL!, process.env.COUNTRY!);
-    const message = getMessage(countryData);
-    await client.sendMessage(process.env.CHAT_ID!, message);
+    const redisClient = new ioRedis(process.env.REDIS_URL!);
+    const telegramClient = getTelegramClient(process.env.BOT_TOKEN!);
+
+    const prevCountryData = await getCache(redisClient, key);
+    const currCountryData = await fetchCountryStats(process.env.API_URL!, process.env.COUNTRY!);
+
+    const message = getMessage(currCountryData);
+
+    if (!prevCountryData) {
+        // cache and send message
+        await telegramClient.sendMessage(process.env.CHAT_ID!, message);
+        await setCache(redisClient, key, currCountryData);
+    } else if (hasDataChanged(prevCountryData, currCountryData)) {
+        // cache and send message
+        await telegramClient.sendMessage(process.env.CHAT_ID!, message);
+        await setCache(redisClient, key, currCountryData);
+    } else {
+        // nothing has changed don't send message
+    }
     return;
 }
 
@@ -25,6 +44,23 @@ async function fetchCountryStats(url: string, country: string) {
         throw new Error('Unsuccessful response from api');
     }
     return respJson.countrydata[0];
+}
+
+async function setCache(redisClient: Redis, key: string, countryData: ICountryData) {
+    const cachResult = await redisClient.set(key, JSON.stringify(countryData));
+    console.log(cachResult);
+    return cachResult;
+}
+
+async function getCache(redisClient: Redis, key: string): Promise<ICountryData | null> {
+    const prevCountryData = await redisClient.get(key);
+    console.log(prevCountryData);
+    return prevCountryData ? (JSON.parse(prevCountryData) as ICountryData) : null;
+}
+
+function hasDataChanged(prevCountryData: ICountryData, currCountryData: ICountryData): boolean {
+    const changes = deepDiff.difference(currCountryData, prevCountryData);
+    return !!Object.keys(changes).length;
 }
 
 function getMessage(countryData: ICountryData) {
