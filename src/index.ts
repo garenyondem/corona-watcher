@@ -4,11 +4,8 @@ import { IApiResponse, ICountryData } from './types';
 
 async function init() {
     const client = getTelegramClient(process.env.BOT_TOKEN!);
-
     const countryData = await fetchCountryStats(process.env.API_URL!, process.env.COUNTRY!);
-
     const message = getMessage(countryData);
-
     await client.sendMessage(process.env.CHAT_ID!, message);
 }
 
