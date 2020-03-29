@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { Telegram } from 'telegraf';
 import { IApiResponse, ICountryData } from './types';
+import { convertToEmoji } from './helpers';
 
 async function init() {
     const client = getTelegramClient(process.env.BOT_TOKEN!);
@@ -27,14 +28,14 @@ async function fetchCountryStats(url: string, country: string) {
 
 function getMessage(countryData: ICountryData) {
     return `🇹🇷 
-            Total Cases: ${countryData.total_cases}
-            Total Recovered: ${countryData.total_recovered}
-            Total Deaths: ${countryData.total_deaths}
-            Total Active Cases: ${countryData.total_active_cases}
-            Total New Cases Today: ${countryData.total_new_cases_today}
-            Total New Deaths Today: ${countryData.total_new_deaths_today}
-            Total Serious Cases: ${countryData.total_serious_cases}
-            `;
+    Total Cases: ${convertToEmoji(countryData.total_cases)}
+    Total Recovered: ${convertToEmoji(countryData.total_recovered)}
+    Total Deaths: ${convertToEmoji(countryData.total_deaths)}
+    Total Active Cases: ${convertToEmoji(countryData.total_active_cases)}
+    Total New Cases Today: ${convertToEmoji(countryData.total_new_cases_today)}
+    Total New Deaths Today: ${convertToEmoji(countryData.total_new_deaths_today)}
+    Total Serious Cases: ${convertToEmoji(countryData.total_serious_cases)}
+    `;
 }
 
 init()
