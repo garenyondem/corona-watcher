@@ -40,7 +40,9 @@ function getMessage(countryData: ICountryData) {
 init()
     .catch((err) => {
         console.error(err);
+        process.exit(1);
     })
     .finally(() => {
-        process.exit();
+        // success exit
+        process.exit(0);
     });
