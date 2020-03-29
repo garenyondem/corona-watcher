@@ -27,15 +27,16 @@ async function fetchCountryStats(url: string, country: string) {
 }
 
 function getMessage(countryData: ICountryData) {
-    return `🇹🇷 
-    Total Cases: ${convertToEmoji(countryData.total_cases)}
-    Total Recovered: ${convertToEmoji(countryData.total_recovered)}
-    Total Deaths: ${convertToEmoji(countryData.total_deaths)}
-    Total Active Cases: ${convertToEmoji(countryData.total_active_cases)}
-    Total New Cases Today: ${convertToEmoji(countryData.total_new_cases_today)}
-    Total New Deaths Today: ${convertToEmoji(countryData.total_new_deaths_today)}
-    Total Serious Cases: ${convertToEmoji(countryData.total_serious_cases)}
-    `;
+    return (
+        `🇹🇷\n` +
+        `Total Cases: ${convertToEmoji(countryData.total_cases)}\n` +
+        `Total Recovered: ${convertToEmoji(countryData.total_recovered)}\n` +
+        `Total Deaths: ${convertToEmoji(countryData.total_deaths)}\n` +
+        `Total Active Cases: ${convertToEmoji(countryData.total_active_cases)}\n` +
+        `Total New Cases Today: ${convertToEmoji(countryData.total_new_cases_today)}\n` +
+        `Total New Deaths Today: ${convertToEmoji(countryData.total_new_deaths_today)}\n` +
+        `Total Serious Cases: ${convertToEmoji(countryData.total_serious_cases)}`
+    );
 }
 
 init()
