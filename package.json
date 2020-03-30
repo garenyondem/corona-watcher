@@ -12,7 +12,6 @@
     "@types/ioredis": "^4.14.9",
     "@types/node": "^13.9.5",
     "@types/node-fetch": "^2.5.5",
-    "deep-diff-object": "git+https://github.com/garenyondem/deep-diff-object.git",
     "ioredis": "^4.16.1",
     "node-fetch": "^2.6.0",
     "telegraf": "^3.36.0",

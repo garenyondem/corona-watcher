@@ -2,7 +2,6 @@ import fetch from 'node-fetch';
 import { Telegram } from 'telegraf';
 import { IApiResponse, ICountryData } from './types';
 import { convertToEmoji } from './helpers';
-import { difference } from 'deep-diff-object';
 import { RedisClient } from './redis';
 
 const key = 'prev-tr';
@@ -47,8 +46,7 @@ async function fetchCountryStats(url: string, country: string) {
 }
 
 function hasDataChanged(prevCountryData: ICountryData, currCountryData: ICountryData): boolean {
-    const changes = difference(currCountryData, prevCountryData);
-    return !!Object.keys(changes).length;
+    return JSON.stringify(prevCountryData) !== JSON.stringify(currCountryData);
 }
 
 function getMessage(countryData: ICountryData) {
