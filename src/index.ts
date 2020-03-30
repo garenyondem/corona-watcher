@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import { Telegram } from 'telegraf';
 import { IApiResponse, ICountryData } from './types';
 import { convertToEmoji } from './helpers';
-import deepDiff from 'deep-diff-object';
+import { difference } from 'deep-diff-object';
 import { RedisClient } from './redis';
 
 const key = 'prev-tr';
@@ -47,7 +47,7 @@ async function fetchCountryStats(url: string, country: string) {
 }
 
 function hasDataChanged(prevCountryData: ICountryData, currCountryData: ICountryData): boolean {
-    const changes = deepDiff.difference(currCountryData, prevCountryData);
+    const changes = difference(currCountryData, prevCountryData);
     return !!Object.keys(changes).length;
 }
 
