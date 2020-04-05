@@ -3,6 +3,7 @@ import { Telegram } from 'telegraf';
 import { IApiResponse, ICountryData } from './types';
 import { convertNumberToEmoji, convertCountryToEmoji, convertStringToHeaderCase } from './helpers';
 import { RedisClient } from './redis';
+import { updatedDiff } from 'deep-object-diff';
 
 let cacheKey = 'prev-%country%';
 
@@ -56,6 +57,11 @@ async function fetchCountryStats(url: string, country: string) {
 
 function hasDataChanged(prevCountryData: ICountryData, currCountryData: ICountryData): boolean {
     return JSON.stringify(prevCountryData) !== JSON.stringify(currCountryData);
+}
+
+function findChangedData(prevCountryData: ICountryData, currCountryData: ICountryData) {
+    const updatedFields = updatedDiff(prevCountryData, currCountryData);
+    return updatedFields;
 }
 
 function getMessage(countryData: ICountryData, statKeys: string[]) {
