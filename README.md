@@ -1,3 +1,5 @@
 ## Corona Watch
 
-tba
+🇹🇷 👉 https://t.me/corona_watch
+
+more tba
