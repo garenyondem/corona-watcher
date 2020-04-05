@@ -4,7 +4,7 @@ import { IApiResponse, ICountryData } from './types';
 import { convertNumberToEmoji, convertCountryToEmoji, convertStringToHeaderCase } from './helpers';
 import { RedisClient } from './redis';
 
-const key = 'prev-tr';
+const cacheKey = 'prev-tr';
 
 const statsToDisplay = [
     'total_cases',
@@ -21,7 +21,7 @@ async function init() {
     const redisClient = new RedisClient(process.env.REDIS_URL!);
     const telegramClient = getTelegramClient(process.env.BOT_TOKEN!);
 
-    const prevCountryData = await redisClient.getCache(key);
+    const prevCountryData = await redisClient.getCache(cacheKey);
     const currCountryData = await fetchCountryStats(process.env.API_URL!, process.env.COUNTRY!);
 
     const message = getMessage(currCountryData, statsToDisplay);
@@ -29,11 +29,11 @@ async function init() {
     if (!prevCountryData) {
         // cache and send message
         await telegramClient.sendMessage(process.env.CHAT_ID!, message);
-        await redisClient.setCache(key, currCountryData);
+        await redisClient.setCache(cacheKey, currCountryData);
     } else if (hasDataChanged(prevCountryData, currCountryData)) {
         // cache and send message
         await telegramClient.sendMessage(process.env.CHAT_ID!, message);
-        await redisClient.setCache(key, currCountryData);
+        await redisClient.setCache(cacheKey, currCountryData);
     } else {
         // nothing has changed don't send message
     }
