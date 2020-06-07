@@ -24,7 +24,7 @@ async function init() {
 
     const prevCountryData = await redisClient.getCache(cacheKey);
     const currCountryData = await fetchCountryStats(process.env.API_URL!, process.env.COUNTRY!);
-    const message = getMessage(currCountryData, statsToDisplay);
+    const message = getMessage(currCountryData, prevCountryData, statsToDisplay);
 
     if (!prevCountryData) {
         await telegramClient.sendMessage(process.env.CHAT_ID!, message);
@@ -58,11 +58,26 @@ function hasDataChanged(prevCountryData: ICountryData, currCountryData: ICountry
     return JSON.stringify(prevCountryData) !== JSON.stringify(currCountryData);
 }
 
-function getMessage(countryData: ICountryData, statKeys: string[]) {
+function getMessage(currCountryData: ICountryData, prevCountryData: ICountryData | null, statKeys: string[]) {
     return statKeys.reduce((acc: string, key: string) => {
-        const stats = countryData[key] != null ? convertNumberToEmoji(countryData[key]!) : '⚠️';
+        let stats = '⚠️';
+        if (currCountryData[key] != null) {
+            stats = convertNumberToEmoji(currCountryData[key]!);
+            if (prevCountryData) {
+                stats = compareAndAddTrendSign(currCountryData[key]!, prevCountryData[key]!, stats);
+            }
+        }
         return (acc += `${convertStringToHeaderCase(key)}: ${stats}\n`);
     }, `${convertCountryToEmoji(process.env.COUNTRY!)}\n`);
+}
+
+function compareAndAddTrendSign(currValue: string | number, prevValue: string | number, text: string): string {
+    if (currValue! > prevValue) {
+        text += '↗️';
+    } else if (currValue < prevValue) {
+        text += '↘️';
+    }
+    return text;
 }
 
 init()
